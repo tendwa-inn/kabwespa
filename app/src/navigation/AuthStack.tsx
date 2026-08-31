@@ -6,6 +6,7 @@ import SignUpScreen from "../screens/auth/SignUpScreen";
 import AdminLoginScreen from "../screens/auth/AdminLoginScreen";
 import AboutUsScreen from "../screens/about/AboutUsScreen";
 import ContactUsScreen from "../screens/contact/ContactUsScreen";
+import PricingScreen from "../screens/pricing/PricingScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -18,6 +19,7 @@ export default function AuthStack() {
       <Stack.Screen name="AdminLogin" component={AdminLoginScreen} />
       <Stack.Screen name="AboutUs" component={AboutUsScreen} />
       <Stack.Screen name="ContactUs" component={ContactUsScreen} />
+      <Stack.Screen name="Pricing" component={PricingScreen} />
     </Stack.Navigator>
   );
 }

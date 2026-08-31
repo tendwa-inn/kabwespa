@@ -97,6 +97,10 @@ export default function WelcomeScreen() {
           <Text style={styles.link} onPress={() => navigation.navigate("ContactUs")}>
             {t("welcome.contactUs")}
           </Text>
+          <Text style={styles.linkDivider}>·</Text>
+          <Text style={styles.link} onPress={() => navigation.navigate("Pricing")}>
+            {t("welcome.pricing")}
+          </Text>
         </View>
 
         <View style={{ marginTop: spacing.lg }}>

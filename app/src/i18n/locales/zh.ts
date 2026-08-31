@@ -26,6 +26,7 @@ export default {
     createAccount: "创建账户",
     aboutUs: "关于我们",
     contactUs: "联系我们",
+    pricing: "价格",
   },
   auth: {
     welcomeBack: "欢迎回来",

@@ -27,6 +27,7 @@ export default {
     createAccount: "Panga Akaunti",
     aboutUs: "Pali Ifwe",
     contactUs: "Tulanshanyeni",
+    pricing: "Imitengo",
   },
   auth: {
     welcomeBack: "Mwaiseni Nakabili",

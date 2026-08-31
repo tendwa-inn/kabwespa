@@ -26,6 +26,7 @@ export default {
     createAccount: "Create Account",
     aboutUs: "About Us",
     contactUs: "Contact Us",
+    pricing: "Pricing",
   },
   auth: {
     welcomeBack: "Welcome back",

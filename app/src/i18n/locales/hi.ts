@@ -26,6 +26,7 @@ export default {
     createAccount: "खाता बनाएं",
     aboutUs: "हमारे बारे में",
     contactUs: "संपर्क करें",
+    pricing: "मूल्य सूची",
   },
   auth: {
     welcomeBack: "वापसी पर स्वागत है",

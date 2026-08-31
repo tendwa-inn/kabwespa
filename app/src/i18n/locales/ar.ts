@@ -26,6 +26,7 @@ export default {
     createAccount: "إنشاء حساب",
     aboutUs: "من نحن",
     contactUs: "اتصل بنا",
+    pricing: "الأسعار",
   },
   auth: {
     welcomeBack: "مرحبًا بعودتك",

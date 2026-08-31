@@ -27,6 +27,7 @@ export default {
     createAccount: "Pangani Akaunti",
     aboutUs: "Za Ife",
     contactUs: "Tilankhuleni",
+    pricing: "Mitengo",
   },
   auth: {
     welcomeBack: "Takulandirani kuwelenga",

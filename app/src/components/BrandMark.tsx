@@ -1,56 +1,38 @@
 import React, { useEffect, useState } from "react";
-import { Image, Platform } from "react-native";
+import { Image } from "react-native";
 import Svg, { Circle, Path } from "react-native-svg";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { colors } from "../theme/theme";
 import { fetchServices } from "../api/services";
 import { photoUrl } from "../api/client";
+import { readSettingsCacheSync, readSettingsCacheAsync, writeSettingsCache } from "../lib/settingsCache";
 
 type Props = { size?: number };
 
 const PETAL_D = "M100,100 C82,82 82,42 100,26 C118,42 118,82 100,100 Z";
-const LOGO_CACHE_KEY = "kabwe.logo.cache";
 
-// Read synchronously on web so the very first render already shows the
-// last-known logo instead of flashing the default mark before the network
-// fetch resolves. Native falls back to the async AsyncStorage read below.
-function readSyncCache(): string | null | undefined {
-  if (Platform.OS !== "web") return undefined;
-  try {
-    const raw = window.localStorage.getItem(LOGO_CACHE_KEY);
-    return raw ? JSON.parse(raw) : undefined;
-  } catch {
-    return undefined;
-  }
-}
-
-let cachedLogo: string | null | undefined = readSyncCache();
+let cachedLogo: string | null | undefined = readSettingsCacheSync()?.logo;
 let fetchStarted = false;
 
 export default function BrandMark({ size = 56 }: Props) {
   const [logo, setLogo] = useState<string | null | undefined>(cachedLogo);
 
   useEffect(() => {
-    if (cachedLogo === undefined && Platform.OS !== "web") {
-      AsyncStorage.getItem(LOGO_CACHE_KEY)
-        .then((raw) => {
-          if (raw !== null && cachedLogo === undefined) {
-            const parsed = JSON.parse(raw);
-            cachedLogo = parsed;
-            setLogo(parsed);
-          }
-        })
-        .catch(() => {});
+    if (cachedLogo === undefined) {
+      readSettingsCacheAsync().then((settings) => {
+        if (settings && cachedLogo === undefined) {
+          cachedLogo = settings.logo;
+          setLogo(settings.logo);
+        }
+      });
     }
 
     if (fetchStarted) return;
     fetchStarted = true;
     fetchServices()
       .then((data) => {
-        const next = data.settings.logo;
-        cachedLogo = next;
-        setLogo(next);
-        AsyncStorage.setItem(LOGO_CACHE_KEY, JSON.stringify(next)).catch(() => {});
+        cachedLogo = data.settings.logo;
+        setLogo(cachedLogo);
+        writeSettingsCache(data.settings);
       })
       .catch(() => {});
   }, []);

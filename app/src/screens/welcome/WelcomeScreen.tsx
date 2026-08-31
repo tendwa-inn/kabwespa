@@ -9,6 +9,7 @@ import { colors, radii, spacing, typography } from "../../theme/theme";
 import { fetchServices } from "../../api/services";
 import { photoUrl } from "../../api/client";
 import { WelcomeSlide } from "../../api/types";
+import { readSettingsCacheSync, readSettingsCacheAsync, writeSettingsCache } from "../../lib/settingsCache";
 import {
   BeautyIllustration,
   CouplesIllustration,
@@ -24,17 +25,28 @@ const FALLBACK_SLIDES: WelcomeSlide[] = [
   { id: "fallback-3", caption: "Beauty Rituals & Full Body Renewal", photo: null },
 ];
 
+const cachedSettings = readSettingsCacheSync();
+
 export default function WelcomeScreen() {
   const navigation = useNavigation<any>();
   const { t } = useTranslation();
-  const [slides, setSlides] = useState<WelcomeSlide[]>(FALLBACK_SLIDES);
+  const [slides, setSlides] = useState<WelcomeSlide[]>(
+    cachedSettings?.welcomeSlides?.length ? cachedSettings.welcomeSlides : FALLBACK_SLIDES
+  );
   const [index, setIndex] = useState(0);
   const fade = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
+    if (!cachedSettings) {
+      readSettingsCacheAsync().then((settings) => {
+        if (settings?.welcomeSlides?.length) setSlides(settings.welcomeSlides);
+      });
+    }
+
     fetchServices()
       .then((data) => {
         if (data.settings.welcomeSlides?.length) setSlides(data.settings.welcomeSlides);
+        writeSettingsCache(data.settings);
       })
       .catch(() => {});
   }, []);

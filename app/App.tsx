@@ -15,7 +15,6 @@ import {
 import { Karla_400Regular, Karla_500Medium, Karla_700Bold } from "@expo-google-fonts/karla";
 
 import { AuthProvider } from "./src/context/AuthContext";
-import { AdminAuthProvider } from "./src/context/AdminAuthContext";
 import RootNavigator from "./src/navigation/RootNavigator";
 import WhatsAppButton from "./src/components/WhatsAppButton";
 import AlertHost from "./src/components/AlertHost";
@@ -51,30 +50,28 @@ export default function App() {
       <SafeAreaProvider>
         <View style={{ flex: 1 }}>
           <AuthProvider>
-            <AdminAuthProvider>
-              <NavigationContainer
-                theme={{
-                  dark: true,
-                  colors: {
-                    primary: colors.primary,
-                    background: colors.background,
-                    card: colors.surface,
-                    text: colors.textPrimary,
-                    border: colors.border,
-                    notification: colors.accent,
-                  },
-                  fonts: {
-                    regular: { fontFamily: "Karla_400Regular", fontWeight: "400" },
-                    medium: { fontFamily: "Karla_500Medium", fontWeight: "500" },
-                    bold: { fontFamily: "Karla_700Bold", fontWeight: "700" },
-                    heavy: { fontFamily: "Karla_700Bold", fontWeight: "700" },
-                  },
-                }}
-              >
-                <StatusBar style="light" />
-                <RootNavigator />
-              </NavigationContainer>
-            </AdminAuthProvider>
+            <NavigationContainer
+              theme={{
+                dark: true,
+                colors: {
+                  primary: colors.primary,
+                  background: colors.background,
+                  card: colors.surface,
+                  text: colors.textPrimary,
+                  border: colors.border,
+                  notification: colors.accent,
+                },
+                fonts: {
+                  regular: { fontFamily: "Karla_400Regular", fontWeight: "400" },
+                  medium: { fontFamily: "Karla_500Medium", fontWeight: "500" },
+                  bold: { fontFamily: "Karla_700Bold", fontWeight: "700" },
+                  heavy: { fontFamily: "Karla_700Bold", fontWeight: "700" },
+                },
+              }}
+            >
+              <StatusBar style="light" />
+              <RootNavigator />
+            </NavigationContainer>
           </AuthProvider>
           <WhatsAppButton />
           <AlertHost />

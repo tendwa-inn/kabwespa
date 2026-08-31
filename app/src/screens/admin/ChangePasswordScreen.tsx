@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { ScrollView, StyleSheet, Text } from "react-native";
 import { Alert } from "../../lib/alertShim";
 import ScreenHeader from "../../components/ScreenHeader";
@@ -6,23 +6,17 @@ import Card from "../../components/Card";
 import TextField from "../../components/TextField";
 import Button from "../../components/Button";
 import { colors, spacing, typography } from "../../theme/theme";
-import { changeAdminPassword, fetchAdminProfile, updateAdminDisplayName } from "../../api/admin";
-import { useAdminAuth } from "../../context/AdminAuthContext";
+import { changePassword, updateDisplayName } from "../../api/auth";
+import { useAuth } from "../../context/AuthContext";
 
 export default function ChangePasswordScreen({ navigation }: any) {
-  const { admin, updateAdmin } = useAdminAuth();
-  const [displayName, setDisplayName] = useState("");
+  const { user, updateUser } = useAuth();
+  const [displayName, setDisplayName] = useState(user?.fullName || "");
   const [savingName, setSavingName] = useState(false);
   const [current, setCurrent] = useState("");
   const [next, setNext] = useState("");
   const [confirm, setConfirm] = useState("");
   const [saving, setSaving] = useState(false);
-
-  useEffect(() => {
-    fetchAdminProfile()
-      .then((data) => setDisplayName(data.admin.displayName))
-      .catch(() => {});
-  }, []);
 
   const saveDisplayName = async () => {
     if (!displayName.trim()) {
@@ -31,8 +25,8 @@ export default function ChangePasswordScreen({ navigation }: any) {
     }
     setSavingName(true);
     try {
-      const data = await updateAdminDisplayName(displayName.trim());
-      if (admin) await updateAdmin({ ...admin, displayName: data.admin.displayName });
+      const data = await updateDisplayName(displayName.trim());
+      await updateUser(data.user);
       Alert.alert("Saved", "New entries will now be recorded under this name.");
     } catch (e: any) {
       Alert.alert("Could not save", e.message);
@@ -52,7 +46,7 @@ export default function ChangePasswordScreen({ navigation }: any) {
     }
     setSaving(true);
     try {
-      await changeAdminPassword(current, next);
+      await changePassword(current, next);
       Alert.alert("Password updated", "Use your new password next time you sign in.");
       navigation.goBack();
     } catch (e: any) {

@@ -24,3 +24,19 @@ export async function uploadProfilePhoto(uri: string, fileName: string, mimeType
     isForm: true,
   });
 }
+
+export function updateDisplayName(fullName: string) {
+  return apiRequest<{ user: User }>("/api/auth/display-name", {
+    method: "PUT",
+    body: { fullName },
+    tokenKey: USER_TOKEN_KEY,
+  });
+}
+
+export function changePassword(currentPassword: string, newPassword: string) {
+  return apiRequest<{ ok: boolean }>("/api/auth/change-password", {
+    method: "POST",
+    body: { currentPassword, newPassword },
+    tokenKey: USER_TOKEN_KEY,
+  });
+}

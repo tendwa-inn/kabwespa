@@ -111,7 +111,7 @@ export type PromoCode = {
   createdAt: string;
 };
 
-export type UserRole = "user" | "manager";
+export type UserRole = "user" | "manager" | "admin";
 
 export type AdminUserRow = {
   id: string;

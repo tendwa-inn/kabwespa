@@ -1,4 +1,4 @@
-import { apiRequest, ADMIN_TOKEN_KEY } from "./client";
+import { apiRequest, USER_TOKEN_KEY } from "./client";
 import { AssistantCategory, AssistantQuestion } from "./types";
 
 export function fetchAssistantQuestions() {
@@ -9,7 +9,7 @@ export function addAssistantQuestion(question: string, answer: string, category:
   return apiRequest<{ question: AssistantQuestion }>("/api/assistant-questions", {
     method: "POST",
     body: { question, answer, category },
-    tokenKey: ADMIN_TOKEN_KEY,
+    tokenKey: USER_TOKEN_KEY,
   });
 }
 
@@ -20,13 +20,13 @@ export function updateAssistantQuestion(
   return apiRequest<{ question: AssistantQuestion }>(`/api/assistant-questions/${id}`, {
     method: "PUT",
     body: changes,
-    tokenKey: ADMIN_TOKEN_KEY,
+    tokenKey: USER_TOKEN_KEY,
   });
 }
 
 export function deleteAssistantQuestion(id: string) {
   return apiRequest<{ ok: boolean }>(`/api/assistant-questions/${id}`, {
     method: "DELETE",
-    tokenKey: ADMIN_TOKEN_KEY,
+    tokenKey: USER_TOKEN_KEY,
   });
 }

@@ -31,12 +31,10 @@ function toCarriedForward(row) {
 }
 
 async function recorderName(req) {
-  if (req.auth.role === "manager") {
-    const { data: user } = await supabase.from("users").select("full_name, username").eq("id", req.auth.sub).maybeSingle();
-    return user ? `${user.full_name || user.username} (Manager)` : req.auth.username;
-  }
-  const { data: admin } = await supabase.from("admins").select("display_name, username").eq("id", req.auth.sub).maybeSingle();
-  return admin?.display_name || admin?.username || req.auth.username;
+  const { data: user } = await supabase.from("users").select("full_name, username").eq("id", req.auth.sub).maybeSingle();
+  if (!user) return req.auth.username;
+  const name = user.full_name || user.username;
+  return req.auth.role === "manager" ? `${name} (Manager)` : name;
 }
 
 async function computeSummary() {

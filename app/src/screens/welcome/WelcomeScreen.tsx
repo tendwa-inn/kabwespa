@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Animated, Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Animated, Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
 import Button from "../../components/Button";
@@ -86,17 +86,13 @@ export default function WelcomeScreen() {
       </View>
 
       <View style={styles.bottom}>
-        <Pressable
-          style={styles.brandRow}
-          onLongPress={() => navigation.navigate("AdminLogin")}
-          delayLongPress={1200}
-        >
+        <View style={styles.brandRow}>
           <BrandMark size={44} />
           <View>
             <Text style={styles.brand}>The Kabwe Spa</Text>
             <Text style={styles.brandSub}>{t("welcome.tagline")}</Text>
           </View>
-        </Pressable>
+        </View>
 
         <Button label={t("welcome.signIn")} onPress={() => navigation.navigate("Login")} />
         <View style={{ height: spacing.sm }} />

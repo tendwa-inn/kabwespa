@@ -93,6 +93,9 @@ router.put("/:id/role", requireAuth("admin"), async (req, res) => {
   if (!["user", "manager"].includes(role)) {
     return res.status(400).json({ error: "Role must be 'user' or 'manager'" });
   }
+  if (req.params.id === req.auth.sub) {
+    return res.status(400).json({ error: "You can't change your own role here" });
+  }
   const { data: user, error } = await supabase
     .from("users")
     .update({ role })
@@ -104,37 +107,10 @@ router.put("/:id/role", requireAuth("admin"), async (req, res) => {
   res.json({ user: { id: user.id, role: user.role } });
 });
 
-router.post("/:id/promote-to-admin", requireAuth("admin"), async (req, res) => {
-  try {
-    const { data: user, error: userError } = await supabase.from("users").select("*").eq("id", req.params.id).maybeSingle();
-    if (userError) throw new Error(userError.message);
-    if (!user) return res.status(404).json({ error: "User not found" });
-
-    const { data: existingAdmin, error: lookupError } = await supabase
-      .from("admins")
-      .select("id")
-      .ilike("username", user.username)
-      .maybeSingle();
-    if (lookupError) throw new Error(lookupError.message);
-    if (existingAdmin) return res.status(409).json({ error: "An admin account with this username already exists" });
-
-    const { data: admin, error } = await supabase
-      .from("admins")
-      .insert({
-        username: user.username,
-        display_name: user.full_name || user.username,
-        password_hash: user.password_hash,
-      })
-      .select()
-      .single();
-    if (error) throw new Error(error.message);
-    res.status(201).json({ admin: { id: admin.id, username: admin.username, displayName: admin.display_name } });
-  } catch (e) {
-    res.status(500).json({ error: e.message });
-  }
-});
-
 router.delete("/:id", requireAuth("admin"), async (req, res) => {
+  if (req.params.id === req.auth.sub) {
+    return res.status(400).json({ error: "You can't delete your own account" });
+  }
   const { error, count } = await supabase.from("users").delete({ count: "exact" }).eq("id", req.params.id);
   if (error) return res.status(500).json({ error: error.message });
   if (!count) return res.status(404).json({ error: "User not found" });

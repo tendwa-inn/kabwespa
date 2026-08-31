@@ -98,7 +98,7 @@ router.post("/login", async (req, res) => {
   res.json({ token, user: toPublicUser(user) });
 });
 
-router.get("/me", requireAuth(["user", "manager"]), async (req, res) => {
+router.get("/me", requireAuth(["user", "manager", "admin"]), async (req, res) => {
   const { data: user, error } = await supabase.from("users").select("*").eq("id", req.auth.sub).maybeSingle();
   if (error) return res.status(500).json({ error: error.message });
   if (!user) return res.status(404).json({ error: "Account not found" });
@@ -106,7 +106,41 @@ router.get("/me", requireAuth(["user", "manager"]), async (req, res) => {
   res.json({ token, user: toPublicUser(user) });
 });
 
-router.post("/photo", requireAuth(["user", "manager"]), upload.single("photo"), async (req, res) => {
+router.put("/display-name", requireAuth(["user", "manager", "admin"]), async (req, res) => {
+  const { fullName } = req.body || {};
+  if (!fullName || !String(fullName).trim()) {
+    return res.status(400).json({ error: "Enter a name" });
+  }
+  const { data: user, error } = await supabase
+    .from("users")
+    .update({ full_name: String(fullName).trim() })
+    .eq("id", req.auth.sub)
+    .select()
+    .maybeSingle();
+  if (error) return res.status(500).json({ error: error.message });
+  if (!user) return res.status(404).json({ error: "Account not found" });
+  res.json({ user: toPublicUser(user) });
+});
+
+router.post("/change-password", requireAuth(["user", "manager", "admin"]), async (req, res) => {
+  const { currentPassword, newPassword } = req.body || {};
+  if (!currentPassword || !newPassword || String(newPassword).length < 6) {
+    return res.status(400).json({ error: "Provide current password and a new password (6+ chars)" });
+  }
+  const { data: user, error } = await supabase.from("users").select("*").eq("id", req.auth.sub).maybeSingle();
+  if (error) return res.status(500).json({ error: error.message });
+  if (!user || !bcrypt.compareSync(currentPassword, user.password_hash)) {
+    return res.status(401).json({ error: "Current password is incorrect" });
+  }
+  const { error: updateError } = await supabase
+    .from("users")
+    .update({ password_hash: bcrypt.hashSync(newPassword, 10) })
+    .eq("id", req.auth.sub);
+  if (updateError) return res.status(500).json({ error: updateError.message });
+  res.json({ ok: true });
+});
+
+router.post("/photo", requireAuth(["user", "manager", "admin"]), upload.single("photo"), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: "No photo uploaded" });
   let url;
   try {

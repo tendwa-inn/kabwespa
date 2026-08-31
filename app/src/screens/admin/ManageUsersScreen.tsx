@@ -6,20 +6,16 @@ import Card from "../../components/Card";
 import TextField from "../../components/TextField";
 import Button from "../../components/Button";
 import { colors, radii, spacing, typography } from "../../theme/theme";
-import {
-  createManagerAccount,
-  deleteUser,
-  fetchUsers,
-  promoteToAdmin,
-  updateUserRole,
-} from "../../api/admin";
+import { createManagerAccount, deleteUser, fetchUsers, updateUserRole } from "../../api/admin";
 import { AdminUserRow } from "../../api/types";
+import { useAuth } from "../../context/AuthContext";
 
 function digitsOnly(value: string) {
   return value.replace(/[^\d]/g, "");
 }
 
 export default function ManageUsersScreen() {
+  const { user: currentUser } = useAuth();
   const [users, setUsers] = useState<AdminUserRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -55,6 +51,31 @@ export default function ManageUsersScreen() {
   };
 
   const toggleRole = (u: AdminUserRow) => {
+    if (u.role === "admin") {
+      Alert.alert(
+        "Demote to manager?",
+        `${u.fullName || u.username} will lose admin access and become a manager instead (can record takings and expenses, but not the rest of the dashboard). They'll need to sign out and back in to see it. To make them admin again, you'll need to do that in Supabase.`,
+        [
+          { text: "Cancel", style: "cancel" },
+          {
+            text: "Demote",
+            style: "destructive",
+            onPress: async () => {
+              setBusyId(u.id);
+              try {
+                await updateUserRole(u.id, "manager");
+                load();
+              } catch (e: any) {
+                Alert.alert("Could not update role", e.message);
+              } finally {
+                setBusyId(null);
+              }
+            },
+          },
+        ]
+      );
+      return;
+    }
     const nextRole = u.role === "manager" ? "user" : "manager";
     Alert.alert(
       nextRole === "manager" ? "Make manager?" : "Remove manager role?",
@@ -72,30 +93,6 @@ export default function ManageUsersScreen() {
               load();
             } catch (e: any) {
               Alert.alert("Could not update role", e.message);
-            } finally {
-              setBusyId(null);
-            }
-          },
-        },
-      ]
-    );
-  };
-
-  const makeAdmin = (u: AdminUserRow) => {
-    Alert.alert(
-      "Make admin?",
-      `${u.fullName || u.username} will get a staff login using their existing username and password, with full access to the admin dashboard. This can't be undone from here.`,
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Make admin",
-          onPress: async () => {
-            setBusyId(u.id);
-            try {
-              await promoteToAdmin(u.id);
-              Alert.alert("Done", `${u.username} can now sign in as staff using their existing password.`);
-            } catch (e: any) {
-              Alert.alert("Could not create admin account", e.message);
             } finally {
               setBusyId(null);
             }
@@ -197,9 +194,9 @@ export default function ManageUsersScreen() {
         <Card key={u.id} style={styles.card}>
           <View style={styles.userHeaderRow}>
             <Text style={styles.service}>{u.fullName || u.username}</Text>
-            {u.role === "manager" && (
+            {(u.role === "manager" || u.role === "admin") && (
               <View style={styles.roleBadge}>
-                <Text style={styles.roleBadgeText}>Manager</Text>
+                <Text style={styles.roleBadgeText}>{u.role === "admin" ? "Admin" : "Manager"}</Text>
               </View>
             )}
           </View>
@@ -214,17 +211,20 @@ export default function ManageUsersScreen() {
             {u.appointmentCount} appointment(s) · joined {new Date(u.createdAt).toLocaleDateString()}
             {u.verified ? " · Verified" : ""}
           </Text>
-          <View style={styles.actionsRow}>
-            <Pressable onPress={() => toggleRole(u)} disabled={busyId === u.id}>
-              <Text style={styles.roleLink}>{u.role === "manager" ? "Remove manager role" : "Make manager"}</Text>
-            </Pressable>
-            <Pressable onPress={() => makeAdmin(u)} disabled={busyId === u.id}>
-              <Text style={styles.roleLink}>Make admin</Text>
-            </Pressable>
-            <Pressable onPress={() => removeUser(u)} disabled={busyId === u.id}>
-              <Text style={styles.deleteLink}>Delete</Text>
-            </Pressable>
-          </View>
+          {u.id === currentUser?.id ? (
+            <Text style={styles.meta}>This is you</Text>
+          ) : (
+            <View style={styles.actionsRow}>
+              <Pressable onPress={() => toggleRole(u)} disabled={busyId === u.id}>
+                <Text style={styles.roleLink}>
+                  {u.role === "admin" ? "Demote to manager" : u.role === "manager" ? "Remove manager role" : "Make manager"}
+                </Text>
+              </Pressable>
+              <Pressable onPress={() => removeUser(u)} disabled={busyId === u.id}>
+                <Text style={styles.deleteLink}>Delete</Text>
+              </Pressable>
+            </View>
+          )}
         </Card>
       ))}
 

@@ -3,7 +3,6 @@ const express = require("express");
 const cors = require("cors");
 
 const authRoutes = require("./routes/auth");
-const adminAuthRoutes = require("./routes/adminAuth");
 const serviceRoutes = require("./routes/services");
 const appointmentRoutes = require("./routes/appointments");
 const transactionRoutes = require("./routes/transactions");
@@ -18,7 +17,6 @@ app.use(express.json());
 app.get("/api/health", (req, res) => res.json({ ok: true }));
 
 app.use("/api/auth", authRoutes);
-app.use("/api/admin/auth", adminAuthRoutes);
 app.use("/api/services", serviceRoutes);
 app.use("/api/appointments", appointmentRoutes);
 app.use("/api/transactions", transactionRoutes);

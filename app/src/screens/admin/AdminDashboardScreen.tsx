@@ -4,7 +4,7 @@ import { useNavigation } from "@react-navigation/native";
 import ScreenHeader from "../../components/ScreenHeader";
 import Card from "../../components/Card";
 import { colors, spacing, typography } from "../../theme/theme";
-import { useAdminAuth } from "../../context/AdminAuthContext";
+import { useAuth } from "../../context/AuthContext";
 
 const ITEMS: { key: string; title: string; desc: string }[] = [
   { key: "ManagePrices", title: "Prices & Descriptions", desc: "Edit what each service costs" },
@@ -19,11 +19,11 @@ const ITEMS: { key: string; title: string; desc: string }[] = [
 
 export default function AdminDashboardScreen() {
   const navigation = useNavigation<any>();
-  const { admin, logOut } = useAdminAuth();
+  const { user, logOut } = useAuth();
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: colors.background }} contentContainerStyle={styles.scroll}>
-      <ScreenHeader eyebrow="Staff Area" title="Admin Dashboard" subtitle={`Signed in as ${admin?.username}`} />
+      <ScreenHeader eyebrow="Staff Area" title="Admin Dashboard" subtitle={`Signed in as ${user?.username}`} />
 
       {ITEMS.map((item) => (
         <Pressable key={item.key} onPress={() => navigation.navigate(item.key)}>

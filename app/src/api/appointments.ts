@@ -1,4 +1,4 @@
-import { apiRequest, USER_TOKEN_KEY, ADMIN_TOKEN_KEY } from "./client";
+import { apiRequest, USER_TOKEN_KEY } from "./client";
 import { Appointment } from "./types";
 
 export function createAppointment(params: {
@@ -30,7 +30,7 @@ export function cancelAppointment(id: string) {
 
 export function fetchAllAppointments() {
   return apiRequest<{ appointments: Appointment[] }>("/api/appointments", {
-    tokenKey: ADMIN_TOKEN_KEY,
+    tokenKey: USER_TOKEN_KEY,
   });
 }
 

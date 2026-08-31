@@ -11,7 +11,6 @@ export const API_BASE =
   envApiUrl || (Platform.OS === "web" && !__DEV__ ? "" : `http://${LOCAL_HOST}:4000`);
 
 export const USER_TOKEN_KEY = "kabwe.user.token";
-export const ADMIN_TOKEN_KEY = "kabwe.admin.token";
 
 type RequestOptions = {
   method?: "GET" | "POST" | "PUT" | "DELETE";

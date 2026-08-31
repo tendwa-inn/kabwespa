@@ -1,4 +1,4 @@
-import { apiRequest, ADMIN_TOKEN_KEY } from "./client";
+import { apiRequest, USER_TOKEN_KEY } from "./client";
 import { appendPhotoField } from "../lib/formFile";
 import { Service, Settings } from "./types";
 
@@ -15,14 +15,14 @@ export function createService(params: {
   return apiRequest<{ service: Service }>(`/api/services`, {
     method: "POST",
     body: params,
-    tokenKey: ADMIN_TOKEN_KEY,
+    tokenKey: USER_TOKEN_KEY,
   });
 }
 
 export function deleteService(id: string) {
   return apiRequest<{ ok: boolean }>(`/api/services/${id}`, {
     method: "DELETE",
-    tokenKey: ADMIN_TOKEN_KEY,
+    tokenKey: USER_TOKEN_KEY,
   });
 }
 
@@ -33,7 +33,7 @@ export function updateService(
   return apiRequest<{ service: Service }>(`/api/services/${id}`, {
     method: "PUT",
     body: changes,
-    tokenKey: ADMIN_TOKEN_KEY,
+    tokenKey: USER_TOKEN_KEY,
   });
 }
 
@@ -43,7 +43,7 @@ export async function uploadServicePhoto(id: string, uri: string, fileName: stri
   return apiRequest<{ service: Service }>(`/api/services/${id}/photo`, {
     method: "POST",
     body: form,
-    tokenKey: ADMIN_TOKEN_KEY,
+    tokenKey: USER_TOKEN_KEY,
     isForm: true,
   });
 }
@@ -54,7 +54,7 @@ export async function uploadHeroPhoto(uri: string, fileName: string, mimeType: s
   return apiRequest<{ settings: Settings }>(`/api/services/hero-photo`, {
     method: "POST",
     body: form,
-    tokenKey: ADMIN_TOKEN_KEY,
+    tokenKey: USER_TOKEN_KEY,
     isForm: true,
   });
 }
@@ -65,7 +65,7 @@ export async function uploadLogoPhoto(uri: string, fileName: string, mimeType: s
   return apiRequest<{ settings: Settings }>(`/api/services/logo-photo`, {
     method: "POST",
     body: form,
-    tokenKey: ADMIN_TOKEN_KEY,
+    tokenKey: USER_TOKEN_KEY,
     isForm: true,
   });
 }
@@ -79,7 +79,7 @@ export function updateContactInfo(changes: {
   return apiRequest<{ settings: Settings }>(`/api/services/contact`, {
     method: "PUT",
     body: changes,
-    tokenKey: ADMIN_TOKEN_KEY,
+    tokenKey: USER_TOKEN_KEY,
   });
 }
 
@@ -90,7 +90,7 @@ export async function uploadLocationPhoto(uri: string, fileName: string, mimeTyp
   return apiRequest<{ settings: Settings }>(`/api/services/location-photos`, {
     method: "POST",
     body: form,
-    tokenKey: ADMIN_TOKEN_KEY,
+    tokenKey: USER_TOKEN_KEY,
     isForm: true,
   });
 }
@@ -98,7 +98,7 @@ export async function uploadLocationPhoto(uri: string, fileName: string, mimeTyp
 export function deleteLocationPhoto(id: string) {
   return apiRequest<{ settings: Settings }>(`/api/services/location-photos/${id}`, {
     method: "DELETE",
-    tokenKey: ADMIN_TOKEN_KEY,
+    tokenKey: USER_TOKEN_KEY,
   });
 }
 
@@ -106,7 +106,7 @@ export function updateLocationCoords(lat: number | null, lng: number | null) {
   return apiRequest<{ settings: Settings }>(`/api/services/location`, {
     method: "PUT",
     body: { lat, lng },
-    tokenKey: ADMIN_TOKEN_KEY,
+    tokenKey: USER_TOKEN_KEY,
   });
 }
 
@@ -116,7 +116,7 @@ export async function uploadWelcomeSlidePhoto(slideId: string, uri: string, file
   return apiRequest<{ settings: Settings }>(`/api/services/welcome-slides/${slideId}/photo`, {
     method: "POST",
     body: form,
-    tokenKey: ADMIN_TOKEN_KEY,
+    tokenKey: USER_TOKEN_KEY,
     isForm: true,
   });
 }

@@ -1,0 +1,8 @@
+{
+  "name": "kabwe-spa",
+  "private": true,
+  "scripts": {
+    "server": "npm --prefix server start",
+    "web": "npm --prefix app run web"
+  }
+}

@@ -33,6 +33,14 @@ export function updateDisplayName(fullName: string) {
   });
 }
 
+export function updateUsername(username: string) {
+  return apiRequest<{ token: string; user: User }>("/api/auth/username", {
+    method: "PUT",
+    body: { username },
+    tokenKey: USER_TOKEN_KEY,
+  });
+}
+
 export function changePassword(currentPassword: string, newPassword: string) {
   return apiRequest<{ ok: boolean }>("/api/auth/change-password", {
     method: "POST",

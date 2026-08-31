@@ -122,6 +122,33 @@ router.put("/display-name", requireAuth(["user", "manager", "admin"]), async (re
   res.json({ user: toPublicUser(user) });
 });
 
+router.put("/username", requireAuth(["user", "manager", "admin"]), async (req, res) => {
+  const { username } = req.body || {};
+  const trimmed = String(username || "").trim();
+  if (trimmed.length < 3) {
+    return res.status(400).json({ error: "Username must be at least 3 characters" });
+  }
+  const { data: existing, error: lookupError } = await supabase
+    .from("users")
+    .select("id")
+    .ilike("username", trimmed)
+    .neq("id", req.auth.sub)
+    .maybeSingle();
+  if (lookupError) return res.status(500).json({ error: lookupError.message });
+  if (existing) return res.status(409).json({ error: "That username is already taken" });
+
+  const { data: user, error } = await supabase
+    .from("users")
+    .update({ username: trimmed })
+    .eq("id", req.auth.sub)
+    .select()
+    .maybeSingle();
+  if (error) return res.status(500).json({ error: error.message });
+  if (!user) return res.status(404).json({ error: "Account not found" });
+  const token = sign({ sub: user.id, role: user.role || "user", username: user.username });
+  res.json({ token, user: toPublicUser(user) });
+});
+
 router.post("/change-password", requireAuth(["user", "manager", "admin"]), async (req, res) => {
   const { currentPassword, newPassword } = req.body || {};
   if (!currentPassword || !newPassword || String(newPassword).length < 6) {

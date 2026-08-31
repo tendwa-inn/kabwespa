@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
 import ScreenHeader from "../../components/ScreenHeader";
@@ -7,8 +7,9 @@ import Card from "../../components/Card";
 import ServiceIcon from "../../components/ServiceIcon";
 import VideoPlayer from "../../components/VideoPlayer";
 import ContactInfo from "../../components/ContactInfo";
-import { colors, currency, spacing, typography } from "../../theme/theme";
+import { colors, currency, radii, spacing, typography } from "../../theme/theme";
 import { fetchServices } from "../../api/services";
+import { photoUrl } from "../../api/client";
 import { Service, Settings } from "../../api/types";
 import { youtubeEmbedUrl } from "../../lib/youtube";
 
@@ -62,8 +63,11 @@ export default function PricingScreen() {
               const embed = youtubeEmbedUrl(service.videoUrl);
               return (
                 <Card key={service.id} style={styles.card}>
+                  {service.photo ? (
+                    <Image source={{ uri: photoUrl(service.photo)! }} style={styles.photo} />
+                  ) : null}
                   <View style={styles.head}>
-                    <ServiceIcon name={service.name} size={44} />
+                    {!service.photo && <ServiceIcon name={service.name} size={44} />}
                     <View style={{ flex: 1 }}>
                       <Text style={styles.name}>{service.name}</Text>
                       <Text style={styles.price}>{currency(service.price)}</Text>
@@ -108,6 +112,13 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   card: { marginBottom: spacing.md },
+  photo: {
+    width: "100%",
+    height: 160,
+    borderRadius: radii.md,
+    backgroundColor: colors.accentSoft,
+    marginBottom: spacing.sm,
+  },
   head: { flexDirection: "row", alignItems: "center", gap: spacing.md, marginBottom: spacing.sm },
   name: { fontFamily: typography.bodyBold, fontSize: 16, color: colors.textPrimary },
   price: { fontFamily: typography.headingBold, fontSize: 15, color: colors.accent, marginTop: 2 },

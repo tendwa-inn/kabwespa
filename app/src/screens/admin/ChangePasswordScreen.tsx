@@ -6,13 +6,15 @@ import Card from "../../components/Card";
 import TextField from "../../components/TextField";
 import Button from "../../components/Button";
 import { colors, spacing, typography } from "../../theme/theme";
-import { changePassword, updateDisplayName } from "../../api/auth";
+import { changePassword, updateDisplayName, updateUsername } from "../../api/auth";
 import { useAuth } from "../../context/AuthContext";
 
 export default function ChangePasswordScreen({ navigation }: any) {
-  const { user, updateUser } = useAuth();
+  const { user, updateUser, updateSession } = useAuth();
   const [displayName, setDisplayName] = useState(user?.fullName || "");
   const [savingName, setSavingName] = useState(false);
+  const [username, setUsername] = useState(user?.username || "");
+  const [savingUsername, setSavingUsername] = useState(false);
   const [current, setCurrent] = useState("");
   const [next, setNext] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -32,6 +34,23 @@ export default function ChangePasswordScreen({ navigation }: any) {
       Alert.alert("Could not save", e.message);
     } finally {
       setSavingName(false);
+    }
+  };
+
+  const saveUsername = async () => {
+    if (!username.trim() || username.trim().length < 3) {
+      Alert.alert("Invalid username", "Username must be at least 3 characters.");
+      return;
+    }
+    setSavingUsername(true);
+    try {
+      const data = await updateUsername(username.trim());
+      await updateSession(data.token, data.user);
+      Alert.alert("Saved", "You'll sign in with this username next time.");
+    } catch (e: any) {
+      Alert.alert("Could not save", e.message);
+    } finally {
+      setSavingUsername(false);
     }
   };
 
@@ -67,6 +86,19 @@ export default function ChangePasswordScreen({ navigation }: any) {
       <Card style={styles.card}>
         <TextField label="Display name" value={displayName} onChangeText={setDisplayName} placeholder="e.g. Zarah" />
         <Button label="Save name" onPress={saveDisplayName} loading={savingName} fullWidth={false} />
+      </Card>
+
+      <Text style={styles.sectionTitle}>Username</Text>
+      <Text style={styles.hint}>What you type to sign in.</Text>
+      <Card style={styles.card}>
+        <TextField
+          label="Username"
+          autoCapitalize="none"
+          autoCorrect={false}
+          value={username}
+          onChangeText={setUsername}
+        />
+        <Button label="Save username" onPress={saveUsername} loading={savingUsername} fullWidth={false} />
       </Card>
 
       <Text style={styles.sectionTitle}>Password</Text>

@@ -18,7 +18,7 @@ export default function VideoModal({
   videoUrl: string | null;
   onClose: () => void;
 }) {
-  const embedUrl = youtubeEmbedUrl(videoUrl);
+  const embedUrl = youtubeEmbedUrl(videoUrl, true);
 
   return (
     <Modal visible={visible} animationType="fade" transparent onRequestClose={onClose}>

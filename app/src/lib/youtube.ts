@@ -12,8 +12,8 @@ export function youtubeId(url: string | null | undefined): string | null {
   return null;
 }
 
-export function youtubeEmbedUrl(url: string | null | undefined): string | null {
+export function youtubeEmbedUrl(url: string | null | undefined, autoplay = false): string | null {
   const id = youtubeId(url);
   if (!id) return null;
-  return `https://www.youtube.com/embed/${id}?autoplay=1&playsinline=1&modestbranding=1&rel=0`;
+  return `https://www.youtube.com/embed/${id}?autoplay=${autoplay ? 1 : 0}&playsinline=1&modestbranding=1&rel=0`;
 }

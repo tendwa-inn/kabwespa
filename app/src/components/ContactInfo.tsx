@@ -31,13 +31,12 @@ function mapsUrl(coords: LocationCoords | null, location: string) {
 }
 
 function rideUrl(coords: LocationCoords | null, location: string) {
-  const base = "https://m.uber.com/ul/?action=setPickup&pickup=my_location";
   if (coords) {
-    return `${base}&dropoff[latitude]=${coords.lat}&dropoff[longitude]=${coords.lng}&dropoff[nickname]=${encodeURIComponent(
-      SPA_NAME
-    )}`;
+    return `https://yango.com/en_int/order/?gto=${coords.lng},${coords.lat}`;
   }
-  return `${base}&dropoff[formatted_address]=${encodeURIComponent(location + ", Zambia")}`;
+  // No pinned coordinates yet — Yango's order page doesn't take a free-text
+  // destination, so just open it and let the guest set their pickup there.
+  return "https://yango.com/en_int/order/";
 }
 
 export default function ContactInfo() {

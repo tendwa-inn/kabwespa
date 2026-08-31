@@ -1,11 +1,16 @@
 import React from "react";
 import { Linking, Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons, FontAwesome } from "@expo/vector-icons";
 import { colors, radii, spacing, typography } from "../theme/theme";
 
-// Filled in once the Android build is published.
-export const ANDROID_APK_URL = "";
+export const ANDROID_APK_URL = "https://expo.dev/artifacts/eas/5IWgu4K-cey_R1RdyCg_pHM--STCcv9TWHG6U8ARly8.apk";
+
+const SOCIAL_LINKS = [
+  { icon: "instagram" as const, url: "https://www.instagram.com/massagespakabwe?utm_source=qr" },
+  { icon: "facebook" as const, url: "https://www.facebook.com/share/1Ezykvn3CS/?mibextid=wwXIfr" },
+  { icon: "whatsapp" as const, url: "https://wa.me/260772180359" },
+];
 
 export default function Footer() {
   const navigation = useNavigation<any>();
@@ -17,6 +22,14 @@ export default function Footer() {
   return (
     <View style={styles.wrap}>
       <View style={styles.divider} />
+
+      <View style={styles.socialRow}>
+        {SOCIAL_LINKS.map((s) => (
+          <Pressable key={s.icon} style={styles.socialButton} onPress={() => Linking.openURL(s.url)}>
+            <FontAwesome name={s.icon} size={18} color={colors.textPrimary} />
+          </Pressable>
+        ))}
+      </View>
 
       {Platform.OS === "web" && (
         <Pressable style={styles.downloadRow} onPress={downloadApk}>
@@ -57,6 +70,21 @@ const styles = StyleSheet.create({
     backgroundColor: colors.border,
     alignSelf: "stretch",
     marginBottom: spacing.lg,
+  },
+  socialRow: {
+    flexDirection: "row",
+    gap: spacing.sm,
+    marginBottom: spacing.lg,
+  },
+  socialButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: colors.border,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: colors.surface,
   },
   downloadRow: {
     flexDirection: "row",

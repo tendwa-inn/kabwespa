@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "The Kabwe Spa",
-    "slug": "the-kabwe-spa",
+    "slug": "vikk",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -11,6 +11,8 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "com.tendwainnovations.kabwespa",
+      "versionCode": 1,
       "adaptiveIcon": {
         "backgroundColor": "#2F3E36",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -21,6 +23,12 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "owner": "vikk98s-team",
+    "extra": {
+      "eas": {
+        "projectId": "04c20ca6-6a72-4d13-bd3d-510a1f71fddd"
+      }
     },
     "plugins": [
       "expo-font",

@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
   thumb: { width: 64, height: 64, borderRadius: radii.sm, marginRight: spacing.md, backgroundColor: colors.accentSoft },
   serviceName: { fontFamily: typography.bodyBold, fontSize: 16, color: colors.textPrimary },
   serviceDesc: { fontFamily: typography.body, fontSize: 12, color: colors.textSecondary, marginTop: 2 },
-  servicePrice: { fontFamily: typography.headingBold, fontSize: 16, color: colors.accent, marginTop: 6 },
+  servicePrice: { fontFamily: typography.bodyBold, fontSize: 16, color: colors.accent, marginTop: 6 },
   actionsRow: { flexDirection: "row", gap: spacing.sm },
   bookButton: {
     alignSelf: "flex-start",

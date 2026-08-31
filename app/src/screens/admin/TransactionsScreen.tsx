@@ -294,7 +294,7 @@ function SummaryRow({ label, value, color, bold }: { label: string; value: numbe
   return (
     <View style={styles.summaryRow}>
       <Text style={styles.summaryLabel}>{label}</Text>
-      <Text style={[styles.summaryValue, { color }, bold && { fontFamily: typography.headingBold, fontSize: 20 }]}>
+      <Text style={[styles.summaryValue, { color }, bold && { fontFamily: typography.bodyBold, fontSize: 22 }]}>
         {currency(value)}
       </Text>
     </View>
@@ -496,7 +496,7 @@ const styles = StyleSheet.create({
   groupLabel: { fontFamily: typography.bodyBold, fontSize: 14, color: colors.textPrimary, marginBottom: 4 },
   groupTotalsRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
   groupTotal: { fontFamily: typography.bodyMedium, fontSize: 13 },
-  groupBalance: { fontFamily: typography.headingBold, fontSize: 16, color: colors.primary },
+  groupBalance: { fontFamily: typography.bodyBold, fontSize: 16, color: colors.primary },
   sectionTitle: {
     fontFamily: typography.bodyBold,
     fontSize: 13,

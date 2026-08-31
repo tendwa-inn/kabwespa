@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
   },
   head: { flexDirection: "row", alignItems: "center", gap: spacing.md, marginBottom: spacing.sm },
   name: { fontFamily: typography.bodyBold, fontSize: 16, color: colors.textPrimary },
-  price: { fontFamily: typography.headingBold, fontSize: 15, color: colors.accent, marginTop: 2 },
+  price: { fontFamily: typography.bodyBold, fontSize: 15, color: colors.accent, marginTop: 2 },
   description: { fontFamily: typography.body, fontSize: 13, color: colors.textSecondary, lineHeight: 19 },
   videoWrap: {
     width: "100%",

@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     textDecorationLine: "line-through",
   },
-  price: { fontFamily: typography.headingBold, fontSize: 17, color: colors.accent },
+  price: { fontFamily: typography.bodyBold, fontSize: 17, color: colors.accent },
   promoTag: {
     fontFamily: typography.bodyBold,
     fontSize: 11,

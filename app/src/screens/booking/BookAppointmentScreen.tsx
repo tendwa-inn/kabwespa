@@ -193,5 +193,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   summaryLabel: { fontFamily: typography.bodyBold, fontSize: 15, color: colors.textPrimary },
-  summaryPrice: { fontFamily: typography.headingBold, fontSize: 18, color: colors.accent },
+  summaryPrice: { fontFamily: typography.bodyBold, fontSize: 18, color: colors.accent },
 });

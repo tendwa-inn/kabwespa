@@ -57,6 +57,6 @@ const styles = StyleSheet.create({
   card: { marginBottom: spacing.sm },
   service: { fontFamily: typography.bodyBold, fontSize: 15, color: colors.textPrimary },
   meta: { fontFamily: typography.body, fontSize: 12, color: colors.textSecondary, marginTop: 2 },
-  price: { fontFamily: typography.headingBold, fontSize: 15, color: colors.accent, marginTop: 6 },
+  price: { fontFamily: typography.bodyBold, fontSize: 15, color: colors.accent, marginTop: 6 },
   empty: { fontFamily: typography.body, color: colors.textSecondary, textAlign: "center", marginTop: spacing.lg },
 });

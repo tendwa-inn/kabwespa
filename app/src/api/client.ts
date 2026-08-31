@@ -1,11 +1,14 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Platform } from "react-native";
 
-// Update this to your computer's LAN IP when testing on a physical device,
-// e.g. "http://192.168.1.20:4000". Android emulator uses 10.0.2.2 to reach
-// the host machine's localhost.
+// EXPO_PUBLIC_API_URL overrides everything below (set it for native builds
+// pointed at a deployed API). On web in production, requests go to the same
+// origin's /api routes. In local dev, use the LAN IP / emulator host below
+// (10.0.2.2 reaches the host machine's localhost from the Android emulator).
 const LOCAL_HOST = Platform.OS === "android" ? "10.0.2.2" : "localhost";
-export const API_BASE = `http://${LOCAL_HOST}:4000`;
+const envApiUrl = process.env.EXPO_PUBLIC_API_URL;
+export const API_BASE =
+  envApiUrl || (Platform.OS === "web" && !__DEV__ ? "" : `http://${LOCAL_HOST}:4000`);
 
 export const USER_TOKEN_KEY = "kabwe.user.token";
 export const ADMIN_TOKEN_KEY = "kabwe.admin.token";
@@ -49,5 +52,6 @@ export async function apiRequest<T = any>(path: string, options: RequestOptions 
 
 export function photoUrl(path: string | null | undefined): string | null {
   if (!path) return null;
+  if (path.startsWith("http://") || path.startsWith("https://")) return path;
   return `${API_BASE}${path}`;
 }

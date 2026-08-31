@@ -21,7 +21,7 @@ export default {
     profile: "الملف الشخصي",
   },
   welcome: {
-    tagline: "منتجع زارا للتدليك · كابوي",
+    tagline: "أفضل منتجع في كابوي",
     signIn: "تسجيل الدخول",
     createAccount: "إنشاء حساب",
     aboutUs: "من نحن",

@@ -21,7 +21,7 @@ export default {
     profile: "Profile",
   },
   welcome: {
-    tagline: "Zarah's Massage Spa · Kabwe",
+    tagline: "The Best Spa in Kabwe",
     signIn: "Sign In",
     createAccount: "Create Account",
     aboutUs: "About Us",

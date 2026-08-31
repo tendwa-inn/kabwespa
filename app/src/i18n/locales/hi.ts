@@ -21,7 +21,7 @@ export default {
     profile: "प्रोफ़ाइल",
   },
   welcome: {
-    tagline: "ज़ाराह मसाज स्पा · काबवे",
+    tagline: "काबवे का सर्वश्रेष्ठ स्पा",
     signIn: "साइन इन करें",
     createAccount: "खाता बनाएं",
     aboutUs: "हमारे बारे में",

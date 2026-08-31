@@ -21,7 +21,7 @@ export default {
     profile: "我的",
   },
   welcome: {
-    tagline: "Zarah按摩水疗中心 · 卡布韦",
+    tagline: "卡布韦最好的水疗中心",
     signIn: "登录",
     createAccount: "创建账户",
     aboutUs: "关于我们",

@@ -22,7 +22,7 @@ export default {
     profile: "Mbiri Yanu",
   },
   welcome: {
-    tagline: "Spa ya Zarah · Kabwe",
+    tagline: "Spa Yabwino Kwambiri mu Kabwe",
     signIn: "Lowani",
     createAccount: "Pangani Akaunti",
     aboutUs: "Za Ife",

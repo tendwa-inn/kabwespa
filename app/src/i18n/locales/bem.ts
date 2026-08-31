@@ -22,7 +22,7 @@ export default {
     profile: "Ifyandi",
   },
   welcome: {
-    tagline: "Spa ya Zarah · Kabwe",
+    tagline: "Spa Isuma Sana mu Kabwe",
     signIn: "Ingila",
     createAccount: "Panga Akaunti",
     aboutUs: "Pali Ifwe",

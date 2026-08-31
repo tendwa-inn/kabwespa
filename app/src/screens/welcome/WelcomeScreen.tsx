@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Animated, Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { Animated, Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
 import Button from "../../components/Button";
 import BrandMark from "../../components/BrandMark";
 import LanguagePicker from "../../components/LanguagePicker";
+import Footer from "../../components/Footer";
 import { colors, radii, spacing, typography } from "../../theme/theme";
 import { fetchServices } from "../../api/services";
 import { photoUrl } from "../../api/client";
@@ -65,7 +66,7 @@ export default function WelcomeScreen() {
   const Illustration = ILLUSTRATIONS[index % ILLUSTRATIONS.length];
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
       <View style={styles.slideArea}>
         <Animated.View style={[styles.slideInner, { opacity: fade }]}>
           {slide.photo ? (
@@ -119,13 +120,16 @@ export default function WelcomeScreen() {
           <LanguagePicker />
         </View>
       </View>
-    </View>
+
+      <Footer />
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  slideArea: { flex: 1, paddingHorizontal: spacing.lg, paddingTop: spacing.xxl, paddingBottom: spacing.md },
+  scrollContent: { flexGrow: 1 },
+  slideArea: { flex: 1, minHeight: 300, paddingHorizontal: spacing.lg, paddingTop: spacing.xxl, paddingBottom: spacing.md },
   slideInner: {
     flex: 1,
     borderRadius: radii.lg,

@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Linking, StyleSheet, Text, View } from "react-native";
+import { Linking, Platform, StyleSheet, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { Alert } from "../lib/alertShim";
 import Card from "./Card";
 import { colors, spacing, typography } from "../theme/theme";
 import { fetchServices } from "../api/services";
 import { LocationCoords } from "../api/types";
+
+const YANGO_PLAY_STORE = "https://play.google.com/store/apps/details?id=com.yandex.yango";
+const YANGO_APP_STORE = "https://apps.apple.com/us/app/yango-taxi-food-delivery/id1437157286";
 
 const DEFAULT_CENTER_PHONE = "+26077686722";
 const DEFAULT_WHATSAPP_NUMBERS = ["+260974068912", "+260772180359"];
@@ -30,12 +33,28 @@ function mapsUrl(coords: LocationCoords | null, location: string) {
   return `https://maps.google.com/?q=${encodeURIComponent(location + ", Zambia")}`;
 }
 
+function detectMobileOS(): "ios" | "android" | null {
+  if (Platform.OS === "ios") return "ios";
+  if (Platform.OS === "android") return "android";
+  if (Platform.OS === "web" && typeof navigator !== "undefined") {
+    const ua = navigator.userAgent || "";
+    if (/iPhone|iPad|iPod/i.test(ua)) return "ios";
+    if (/Android/i.test(ua)) return "android";
+  }
+  return null;
+}
+
+// Yango's app-opening deep link needs a partner tracking token we don't
+// have (issued directly by Yango, not something available generically).
+// Best available option on a phone: send guests straight to Yango's store
+// listing so they can open it (if installed) or install it in one tap.
 function rideUrl(coords: LocationCoords | null, location: string) {
+  const os = detectMobileOS();
+  if (os === "ios") return YANGO_APP_STORE;
+  if (os === "android") return YANGO_PLAY_STORE;
   if (coords) {
     return `https://yango.com/en_int/order/?gto=${coords.lng},${coords.lat}`;
   }
-  // No pinned coordinates yet — Yango's order page doesn't take a free-text
-  // destination, so just open it and let the guest set their pickup there.
   return "https://yango.com/en_int/order/";
 }
 

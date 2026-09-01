@@ -11,6 +11,8 @@ import { fetchServices } from "../../api/services";
 import { photoUrl } from "../../api/client";
 import { WelcomeSlide } from "../../api/types";
 import { readSettingsCacheSync, readSettingsCacheAsync, writeSettingsCache } from "../../lib/settingsCache";
+import { exportPricelistPng } from "../../lib/exportPricelist";
+import { Alert } from "../../lib/alertShim";
 import {
   BeautyIllustration,
   CouplesIllustration,
@@ -35,7 +37,20 @@ export default function WelcomeScreen() {
     cachedSettings?.welcomeSlides?.length ? cachedSettings.welcomeSlides : FALLBACK_SLIDES
   );
   const [index, setIndex] = useState(0);
+  const [downloadingPricelist, setDownloadingPricelist] = useState(false);
   const fade = useRef(new Animated.Value(1)).current;
+
+  const downloadPricelist = async () => {
+    setDownloadingPricelist(true);
+    try {
+      const data = await fetchServices();
+      await exportPricelistPng(data.services, data.settings);
+    } catch (e: any) {
+      Alert.alert("Could not download pricelist", e.message);
+    } finally {
+      setDownloadingPricelist(false);
+    }
+  };
 
   useEffect(() => {
     if (!cachedSettings) {
@@ -109,6 +124,10 @@ export default function WelcomeScreen() {
           <Text style={styles.linkDivider}>·</Text>
           <Text style={styles.link} onPress={() => navigation.navigate("Pricing")}>
             {t("welcome.pricing")}
+          </Text>
+          <Text style={styles.linkDivider}>·</Text>
+          <Text style={styles.link} onPress={downloadingPricelist ? undefined : downloadPricelist}>
+            {downloadingPricelist ? "Preparing…" : "Download Pricelist"}
           </Text>
         </View>
 

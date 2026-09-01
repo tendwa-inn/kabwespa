@@ -4,20 +4,20 @@ import { Service, Settings } from "../api/types";
 const COLORS = {
   background: "#171B18",
   surface: "#20241F",
-  surfaceMuted: "#262B24",
   border: "#333A30",
   textPrimary: "#F3F0E7",
   textSecondary: "#A6A499",
-  primary: "#4A6350",
   accent: "#C9A66B",
   accentSoft: "#2C3327",
 };
 
-const WIDTH = 900;
-const PADDING = 48;
-const CARD_H = 92;
-const CARD_GAP = 14;
-const PHOTO_SIZE = 72;
+const WIDTH = 1000;
+const PADDING = 40;
+const GUTTER = 16;
+const COLS = 2;
+const COL_WIDTH = (WIDTH - PADDING * 2 - GUTTER) / COLS;
+const CARD_H = 118;
+const PHOTO_SIZE = 60;
 
 function loadImage(url: string | null | undefined): Promise<HTMLImageElement | null> {
   return new Promise((resolve) => {
@@ -57,56 +57,82 @@ function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number)
   return lines;
 }
 
-async function drawSection(
+function sectionRows(count: number) {
+  return Math.ceil(count / COLS);
+}
+
+function drawSectionBand(ctx: CanvasRenderingContext2D, title: string, y: number): number {
+  const bandH = 44;
+  ctx.fillStyle = COLORS.accentSoft;
+  ctx.fillRect(0, y, WIDTH, bandH);
+  ctx.strokeStyle = COLORS.accent;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(0, y);
+  ctx.lineTo(WIDTH, y);
+  ctx.stroke();
+  ctx.fillStyle = COLORS.accent;
+  ctx.font = "700 17px Karla_700Bold";
+  ctx.textAlign = "left";
+  ctx.textBaseline = "middle";
+  ctx.fillText(title.toUpperCase(), PADDING, y + bandH / 2 + 1);
+  ctx.textBaseline = "alphabetic";
+  return y + bandH + 20;
+}
+
+function drawServiceGrid(
   ctx: CanvasRenderingContext2D,
-  title: string,
   services: (Service & { photoImg: HTMLImageElement | null })[],
   startY: number
-): Promise<number> {
-  let y = startY;
-  ctx.fillStyle = COLORS.accent;
-  ctx.font = "700 15px Karla_700Bold";
-  ctx.textBaseline = "alphabetic";
-  ctx.fillText(title.toUpperCase(), PADDING, y);
-  y += 30;
-
+): number {
   const sorted = [...services].sort((a, b) => a.price - b.price);
+  let y = startY;
 
-  for (const s of sorted) {
-    roundRectPath(ctx, PADDING, y, WIDTH - PADDING * 2, CARD_H, 14);
-    ctx.fillStyle = COLORS.surface;
-    ctx.fill();
-    ctx.strokeStyle = COLORS.border;
-    ctx.lineWidth = 1;
-    ctx.stroke();
+  for (let i = 0; i < sorted.length; i += COLS) {
+    const row = sorted.slice(i, i + COLS);
+    for (let col = 0; col < row.length; col++) {
+      const s = row[col];
+      const x = PADDING + col * (COL_WIDTH + GUTTER);
 
-    const photoX = PADDING + 10;
-    const photoY = y + (CARD_H - PHOTO_SIZE) / 2;
-    roundRectPath(ctx, photoX, photoY, PHOTO_SIZE, PHOTO_SIZE, 10);
-    ctx.save();
-    ctx.clip();
-    if (s.photoImg) {
-      const img = s.photoImg;
-      const scale = Math.max(PHOTO_SIZE / img.width, PHOTO_SIZE / img.height);
-      const dw = img.width * scale;
-      const dh = img.height * scale;
-      ctx.drawImage(img, photoX - (dw - PHOTO_SIZE) / 2, photoY - (dh - PHOTO_SIZE) / 2, dw, dh);
-    } else {
-      ctx.fillStyle = COLORS.accentSoft;
-      ctx.fillRect(photoX, photoY, PHOTO_SIZE, PHOTO_SIZE);
+      roundRectPath(ctx, x, y, COL_WIDTH, CARD_H, 12);
+      ctx.fillStyle = COLORS.surface;
+      ctx.fill();
+      ctx.strokeStyle = COLORS.border;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      const photoX = x + (COL_WIDTH - PHOTO_SIZE) / 2;
+      const photoY = y + 14;
+      roundRectPath(ctx, photoX, photoY, PHOTO_SIZE, PHOTO_SIZE, 10);
+      ctx.save();
+      ctx.clip();
+      if (s.photoImg) {
+        const img = s.photoImg;
+        const scale = Math.max(PHOTO_SIZE / img.width, PHOTO_SIZE / img.height);
+        const dw = img.width * scale;
+        const dh = img.height * scale;
+        ctx.drawImage(img, photoX - (dw - PHOTO_SIZE) / 2, photoY - (dh - PHOTO_SIZE) / 2, dw, dh);
+      } else {
+        ctx.fillStyle = COLORS.accentSoft;
+        ctx.fillRect(photoX, photoY, PHOTO_SIZE, PHOTO_SIZE);
+      }
+      ctx.restore();
+
+      ctx.textAlign = "center";
+      ctx.fillStyle = COLORS.textPrimary;
+      ctx.font = "700 14px Karla_700Bold";
+      const nameLines = wrapText(ctx, s.name, COL_WIDTH - 16).slice(0, 2);
+      let ny = photoY + PHOTO_SIZE + 18;
+      for (const line of nameLines) {
+        ctx.fillText(line, x + COL_WIDTH / 2, ny);
+        ny += 16;
+      }
+
+      ctx.fillStyle = COLORS.accent;
+      ctx.font = "700 15px Karla_700Bold";
+      ctx.fillText(`K${s.price}`, x + COL_WIDTH / 2, y + CARD_H - 10);
     }
-    ctx.restore();
-
-    const textX = photoX + PHOTO_SIZE + 20;
-    ctx.fillStyle = COLORS.textPrimary;
-    ctx.font = "700 19px PlayfairDisplay_700Bold";
-    ctx.fillText(s.name, textX, y + 38);
-
-    ctx.fillStyle = COLORS.accent;
-    ctx.font = "700 17px Karla_700Bold";
-    ctx.fillText(`K${s.price}`, textX, y + 64);
-
-    y += CARD_H + CARD_GAP;
+    y += CARD_H + GUTTER;
   }
 
   return y;
@@ -125,14 +151,15 @@ export async function exportPricelistPng(services: Service[], settings: Settings
     ...services.map((s) => loadImage(s.photo)),
   ]);
   const photoMap = new Map(services.map((s, i) => [s.id, photoImgs[i]]));
-
   const withPhotos = (list: Service[]) => list.map((s) => ({ ...s, photoImg: photoMap.get(s.id) || null }));
 
   const websiteUrl = "https://kabwespa.com";
+  const scale = 2;
+  const qrPixelSize = 150 * scale;
   const QRCode = await import("qrcode");
   const qrDataUrl = await QRCode.toDataURL(websiteUrl, {
-    width: 240,
-    margin: 1,
+    width: qrPixelSize,
+    margin: 0,
     color: { dark: "#171B18", light: "#F3F0E7" },
   });
   const qrImg = await loadImage(qrDataUrl);
@@ -141,42 +168,34 @@ export async function exportPricelistPng(services: Service[], settings: Settings
     await document.fonts.ready;
   }
 
-  // First pass on an offscreen measuring canvas to compute total height.
-  const contactLines = [
-    settings.centerPhone ? `Call: ${settings.centerPhone}` : null,
-    ...(settings.whatsappNumbers || []).map((n, i) => `WhatsApp${i === 0 ? "" : " " + (i + 1)}: ${n}`),
-  ].filter(Boolean) as string[];
-
   const measureCanvas = document.createElement("canvas");
   const mctx = measureCanvas.getContext("2d")!;
-  mctx.font = "400 15px Karla_400Regular";
-  const locationLines = settings.location ? wrapText(mctx, settings.location, WIDTH - PADDING * 2 - 20) : [];
+  mctx.font = "400 14px Karla_400Regular";
+  const contactLine = [settings.centerPhone, ...(settings.whatsappNumbers || [])].filter(Boolean).join("   ·   ");
+  const locationLines = settings.location ? wrapText(mctx, settings.location, WIDTH - PADDING * 2) : [];
 
   let totalHeight = 0;
-  totalHeight += 210; // header
-  totalHeight += 30 + massage.length * (CARD_H + CARD_GAP); // massage section title + cards
-  totalHeight += 30 + beauty.length * (CARD_H + CARD_GAP); // beauty section title + cards
-  totalHeight += 40; // divider spacing
-  totalHeight += 34 + contactLines.length * 26 + locationLines.length * 22 + 20; // contact block
-  totalHeight += 320; // qr block
+  totalHeight += 176; // header
+  totalHeight += 44 + 20 + sectionRows(massage.length) * (CARD_H + GUTTER); // massage band + grid
+  totalHeight += 44 + 20 + sectionRows(beauty.length) * (CARD_H + GUTTER); // beauty band + grid
+  totalHeight += 44 + 20; // visit us band
+  totalHeight += 24 + locationLines.length * 20 + 20; // contact lines
+  totalHeight += 150 + 60; // qr block
   totalHeight += PADDING;
 
-  const scale = 2;
   const canvas = document.createElement("canvas");
   canvas.width = WIDTH * scale;
   canvas.height = totalHeight * scale;
   const ctx = canvas.getContext("2d")!;
   ctx.scale(scale, scale);
 
-  // Background
   ctx.fillStyle = COLORS.background;
   ctx.fillRect(0, 0, WIDTH, totalHeight);
 
   let y = PADDING;
 
-  // Header
   if (logoImg) {
-    const size = 64;
+    const size = 56;
     const lx = WIDTH / 2 - size / 2;
     roundRectPath(ctx, lx, y, size, size, size / 2);
     ctx.save();
@@ -186,87 +205,63 @@ export async function exportPricelistPng(services: Service[], settings: Settings
     const dh = logoImg.height * scaleImg;
     ctx.drawImage(logoImg, lx - (dw - size) / 2, y - (dh - size) / 2, dw, dh);
     ctx.restore();
-    y += size + 16;
-  } else {
-    y += 8;
+    y += size + 14;
   }
 
   ctx.textAlign = "center";
   ctx.fillStyle = COLORS.textPrimary;
-  ctx.font = "700 34px PlayfairDisplay_700Bold";
-  ctx.fillText("The Kabwe Spa", WIDTH / 2, y + 30);
-  y += 42;
+  ctx.font = "700 32px PlayfairDisplay_700Bold";
+  ctx.fillText("The Kabwe Spa", WIDTH / 2, y + 28);
+  y += 38;
+
+  ctx.fillStyle = COLORS.textSecondary;
+  ctx.font = "500 13px Karla_500Medium";
+  ctx.fillText("ZARAH'S MASSAGE SPA · HIGHRIDGE, KABWE", WIDTH / 2, y);
+  y += 30;
+
+  y = drawSectionBand(ctx, "Massage", y);
+  y = drawServiceGrid(ctx, withPhotos(massage), y);
+  y += 4;
+
+  y = drawSectionBand(ctx, "Beauty", y);
+  y = drawServiceGrid(ctx, withPhotos(beauty), y);
+  y += 4;
+
+  y = drawSectionBand(ctx, "Visit Us", y);
+
+  ctx.textAlign = "center";
+  ctx.fillStyle = COLORS.textPrimary;
+  ctx.font = "600 15px Karla_500Medium";
+  ctx.fillText(contactLine, WIDTH / 2, y);
+  y += 24;
 
   ctx.fillStyle = COLORS.textSecondary;
   ctx.font = "500 14px Karla_500Medium";
-  ctx.fillText("ZARAH'S MASSAGE SPA · HIGHRIDGE, KABWE", WIDTH / 2, y);
-  y += 22;
-
-  ctx.strokeStyle = COLORS.accent;
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(WIDTH / 2 - 60, y + 10);
-  ctx.lineTo(WIDTH / 2 + 60, y + 10);
-  ctx.stroke();
-  y += 40;
-
-  ctx.textAlign = "left";
-
-  y = await drawSection(ctx, "Massage", withPhotos(massage), y);
-  y += 16;
-  y = await drawSection(ctx, "Beauty", withPhotos(beauty), y);
-  y += 20;
-
-  ctx.strokeStyle = COLORS.border;
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(PADDING, y);
-  ctx.lineTo(WIDTH - PADDING, y);
-  ctx.stroke();
-  y += 34;
-
-  ctx.fillStyle = COLORS.accent;
-  ctx.font = "700 15px Karla_700Bold";
-  ctx.fillText("VISIT US", PADDING, y);
-  y += 30;
-
-  ctx.font = "500 16px Karla_500Medium";
-  for (const line of contactLines) {
-    ctx.fillStyle = COLORS.textPrimary;
-    ctx.fillText(line, PADDING, y);
-    y += 26;
+  for (const line of locationLines) {
+    ctx.fillText(line, WIDTH / 2, y);
+    y += 20;
   }
-  if (locationLines.length) {
-    ctx.fillStyle = COLORS.textPrimary;
-    ctx.fillText("Location:", PADDING, y);
-    y += 22;
-    ctx.fillStyle = COLORS.textSecondary;
-    for (const line of locationLines) {
-      ctx.fillText(line, PADDING, y);
-      y += 22;
-    }
-  }
-  y += 20;
+  y += 26;
 
-  // QR block
-  const qrBoxSize = 200;
+  const qrBoxSize = 150;
   const qrBoxX = WIDTH / 2 - qrBoxSize / 2;
-  roundRectPath(ctx, qrBoxX, y, qrBoxSize, qrBoxSize, 16);
+  roundRectPath(ctx, qrBoxX, y, qrBoxSize, qrBoxSize, 14);
   ctx.fillStyle = COLORS.textPrimary;
   ctx.fill();
   if (qrImg) {
-    const pad = 16;
+    ctx.imageSmoothingEnabled = false;
+    const pad = 10;
     ctx.drawImage(qrImg, qrBoxX + pad, y + pad, qrBoxSize - pad * 2, qrBoxSize - pad * 2);
+    ctx.imageSmoothingEnabled = true;
   }
-  y += qrBoxSize + 24;
+  y += qrBoxSize + 18;
 
-  ctx.textAlign = "center";
   ctx.fillStyle = COLORS.textSecondary;
-  ctx.font = "500 14px Karla_500Medium";
+  ctx.font = "500 13px Karla_500Medium";
   ctx.fillText("Scan to visit us online", WIDTH / 2, y);
-  y += 26;
+  y += 22;
   ctx.fillStyle = COLORS.accent;
-  ctx.font = "700 18px Karla_700Bold";
+  ctx.font = "700 17px Karla_700Bold";
   ctx.fillText("kabwespa.com", WIDTH / 2, y);
 
   const blob: Blob | null = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
